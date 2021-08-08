@@ -1,0 +1,28 @@
+div#js-awtd-timer {
+    position: fixed;
+    right: 10px;
+    bottom: 80px;
+    width: 160px;
+    height: 80px;
+    margin: 0;
+    padding: 20px 0;
+    background-image: url('//img.atcoder.jp/assets/contest/digitalclock.png');
+    text-align: center;
+    line-height: 20px;
+    font-size: 15px;
+    cursor: pointer;
+    z-index: 50;
+    // border: 7px solid #36353a;
+    // border-radius: 7px;
+    // background-color: #bdc4bd;
+
+    .js-awtd-timer-top {
+        color: inherit;
+    }
+    .js-awtd-timer-bottom {
+        color: #cc0000;
+    }
+}
+p#fixed-server-timer {
+    box-sizing: border-box;
+}
