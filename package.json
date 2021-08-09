@@ -1,6 +1,6 @@
 {
   "name": "atcoder-wait-time-display",
-  "version": "2021.8.0",
+  "version": "2021.8.1",
   "description": "AtCoder の提出待ち時間を表示します．",
   "typeRoots": [
     "types",

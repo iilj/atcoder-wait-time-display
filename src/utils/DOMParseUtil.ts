@@ -102,6 +102,17 @@ export const getSubmitIntervalSecs = async (contestSlug: string): Promise<number
         }
     }
 
+    // PAST 仕様
+    //   「同じ問題に1分以内に再提出することはできません」
+    {
+        const matchArray: RegExpExecArray | null = /(\d+)(秒|分|時間).{1,5}再提出.{0,10}できません/.exec(statementText);
+        if (matchArray !== null) {
+            if (matchArray[2] === '秒') return Number(matchArray[1]);
+            if (matchArray[2] === '分') return Number(matchArray[1]) * 60;
+            if (matchArray[2] === '時間') return Number(matchArray[1]) * 3600;
+        }
+    }
+
     // Chokudai Contest 仕様
     //   「CEの提出を除いて5分に1回しか提出できません」
     //   「前の提出から30秒以上開けての提出をお願いします」
