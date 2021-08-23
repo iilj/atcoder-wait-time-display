@@ -123,7 +123,7 @@ export const getSubmitIntervalSecs = async (contestSlug: string): Promise<number
         const matchArray: RegExpExecArray | null = /提出[^\d]{1,5}(\d+)(秒|分|時間)以上(?:空け|開け)/.exec(
             statementText
         );
-        console.log(matchArray);
+        // console.log(matchArray);
         if (matchArray !== null) {
             if (matchArray[2] === '秒') return Number(matchArray[1]);
             if (matchArray[2] === '分') return Number(matchArray[1]) * 60;
@@ -132,6 +132,53 @@ export const getSubmitIntervalSecs = async (contestSlug: string): Promise<number
     }
     {
         const matchArray: RegExpExecArray | null = /(\d+)(秒|分|時間)に1回.{1,5}提出/.exec(statementText);
+        if (matchArray !== null) {
+            if (matchArray[2] === '秒') return Number(matchArray[1]);
+            if (matchArray[2] === '分') return Number(matchArray[1]) * 60;
+            if (matchArray[2] === '時間') return Number(matchArray[1]) * 3600;
+        }
+    }
+
+    // ゲノコン2021 仕様
+    //   「提出時間の間隔は，8/28 21:00までは10分，8/28 21:00以降は2時間となります」
+    {
+        const matchArray: RegExpExecArray | null =
+            /提出[^\d]{1,5}間隔[^\d]+?(?:(\d+)\/(\d+) (\d\d):(\d\d)(まで|以降)は(\d+)(秒|分|時間)[，、,\s]?)+/.exec(
+                statementText
+            );
+        // console.log(matchArray);
+        if (matchArray !== null) {
+            const re = /(\d+)\/(\d+) (\d+):(\d\d)(まで|以降)は(\d+)(秒|分|時間)/g;
+            let matchArrayInner;
+            const currentTime = moment();
+            while ((matchArrayInner = re.exec(matchArray[0]))) {
+                console.log(matchArrayInner);
+                const momentInput: moment.MomentInput = {
+                    year: startTime.year(),
+                    month: Number(matchArrayInner[1]) - 1,
+                    days: Number(matchArrayInner[2]),
+                    hours: Number(matchArrayInner[3]),
+                    minutes: Number(matchArrayInner[4]),
+                };
+                const timeThreshold = moment(momentInput);
+                if (matchArrayInner[5] === 'まで') {
+                    if (currentTime.isBefore(timeThreshold)) {
+                        if (matchArrayInner[7] === '秒') return Number(matchArrayInner[6]);
+                        if (matchArrayInner[7] === '分') return Number(matchArrayInner[6]) * 60;
+                        if (matchArrayInner[7] === '時間') return Number(matchArrayInner[6]) * 3600;
+                    }
+                } else {
+                    if (currentTime.isAfter(timeThreshold)) {
+                        if (matchArrayInner[7] === '秒') return Number(matchArrayInner[6]);
+                        if (matchArrayInner[7] === '分') return Number(matchArrayInner[6]) * 60;
+                        if (matchArrayInner[7] === '時間') return Number(matchArrayInner[6]) * 3600;
+                    }
+                }
+            }
+        }
+    }
+    {
+        const matchArray: RegExpExecArray | null = /提出[^\d]{1,5}間隔.+?(\d+)(秒|分|時間)/.exec(statementText);
         if (matchArray !== null) {
             if (matchArray[2] === '秒') return Number(matchArray[1]);
             if (matchArray[2] === '分') return Number(matchArray[1]) * 60;
